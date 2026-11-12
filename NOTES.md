@@ -34,6 +34,16 @@ Model: `gpt-6-luna` (set `OPENAI_MODEL` in the environment if your account uses 
 - Swimming knowledge: works through the level selector and local save.
 - Safe AI answers: works when the local key, internet, and configured model work; otherwise it shows a friendly key/internet message.
 
+## Vercel
+
+- The page is static at the project root.
+- The online AI endpoint is `api/coach.py`, a Vercel Python Function served at `/api/coach`.
+- Vercel finds the function automatically from the `api` folder; no special build command or `vercel.json` setting is needed.
+- Add one Vercel environment variable named `OPENAI_API_KEY` for the Production, Preview, and Development environments as needed.
+- `OPENAI_MODEL` is optional. If it is not set, the function uses `gpt-6-luna`.
+- The local command remains `python3 server.py`; it reads the key from the ignored local `.env` file.
+- Browser saving remains localStorage on each device; Vercel does not add a database.
+
 ## Maybe Later
 
 - Show an AI response in detail about what the user does wrong.
