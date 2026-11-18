@@ -4,6 +4,7 @@ import pathlib
 import urllib.error
 import urllib.request
 from http.server import BaseHTTPRequestHandler
+from keygen import KeygenError, clear_key, get_key
 
 ROOT = pathlib.Path(__file__).parent.parent
 MODEL = os.environ.get('OPENAI_MODEL', 'gpt-6-luna')
@@ -44,9 +45,10 @@ class handler(BaseHTTPRequestHandler):
                 self.send_json(400, {'error': 'Please ask a swimming question.'})
                 return
 
-            api_key = os.environ.get('OPENAI_API_KEY', '')
-            if not api_key:
-                self.send_json(503, {'error': 'I cannot answer yet. Please check the OPENAI_API_KEY setting in Vercel.'})
+            try:
+                api_key = get_key()
+            except KeygenError as error:
+                self.send_json(503, {'error': {'message': error.message, 'fix': error.fix}})
                 return
 
             context = {'level': body.get('level', 'not chosen'), 'reflections': body.get('reflections', [])}
@@ -57,16 +59,20 @@ class handler(BaseHTTPRequestHandler):
                 'input': [{'role': 'user', 'content': 'Swimmer context: ' + json.dumps(context) + '\n\nQuestion: ' + question}],
                 'max_output_tokens': 500,
             }
-            request = urllib.request.Request(
-                'https://api.openai.com/v1/responses',
-                data=json.dumps(request_body).encode('utf-8'),
-                headers={'Authorization': 'Bearer ' + api_key, 'Content-Type': 'application/json'},
-                method='POST',
-            )
-            with urllib.request.urlopen(request, timeout=45) as response:
-                answer = extract_text(json.loads(response.read().decode('utf-8')))
+            def ask(key):
+                request = urllib.request.Request('https://api.openai.com/v1/responses', data=json.dumps(request_body).encode('utf-8'), headers={'Authorization': 'Bearer ' + key, 'Content-Type': 'application/json'}, method='POST')
+                with urllib.request.urlopen(request, timeout=45) as response: return extract_text(json.loads(response.read().decode('utf-8')))
+            try:
+                answer = ask(api_key)
+            except urllib.error.HTTPError as error:
+                if error.code != 401: raise
+                clear_key()
+                try: answer = ask(get_key(force_refresh=True))
+                except KeygenError as key_error:
+                    self.send_json(503, {'error': {'message': key_error.message, 'fix': key_error.fix}})
+                    return
             self.send_json(200, {'answer': answer or 'I could not find an answer. Please try a shorter question or ask your coach.'})
         except (urllib.error.HTTPError, urllib.error.URLError, TimeoutError, ValueError, json.JSONDecodeError):
-            self.send_json(502, {'error': 'I cannot answer right now. Please check the OPENAI_API_KEY setting and internet connection.'})
+            self.send_json(502, {'error': {'message': 'I cannot answer right now.', 'fix': 'Check the MindDo key service and internet connection.'}})
         except Exception:
             self.send_json(500, {'error': 'Something went wrong. Please try again or ask a coach.'})

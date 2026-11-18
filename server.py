@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import json, os, pathlib, urllib.error, urllib.request
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from keygen import KeygenError, clear_key, get_key
 
 ROOT = pathlib.Path(__file__).parent
 MODEL = os.environ.get('OPENAI_MODEL', 'gpt-6-luna')
@@ -40,14 +41,22 @@ class Handler(BaseHTTPRequestHandler):
         try:
             length = int(self.headers.get('Content-Length', '0')); body = json.loads(self.rfile.read(length).decode('utf-8')); question = str(body.get('question', '')).strip()
             if not question: self.send_json(400, {'error':'Please ask a swimming question.'}); return
-            api_key = load_env().get('OPENAI_API_KEY', '')
-            if not api_key or api_key == 'paste-your-key-here': self.send_json(503, {'error':'I cannot answer yet. Please check the OpenAI key in your local .env file.'}); return
+            for name, value in load_env().items(): os.environ.setdefault(name, value)
+            try: api_key = get_key()
+            except KeygenError as error: self.send_json(503, {'error': {'message': error.message, 'fix': error.fix}}); return
             context = {'level': body.get('level', 'not chosen'), 'reflections': body.get('reflections', [])}
             request_body = {'model': MODEL, 'instructions': (ROOT/'BRIEF.md').read_text(encoding='utf-8'), 'input': [{'role':'user','content':'Swimmer context: '+json.dumps(context)+'\n\nQuestion: '+question}], 'max_output_tokens':500}
-            request = urllib.request.Request('https://api.openai.com/v1/responses', data=json.dumps(request_body).encode('utf-8'), headers={'Authorization':'Bearer '+api_key,'Content-Type':'application/json'}, method='POST')
-            with urllib.request.urlopen(request, timeout=45) as response: answer = extract_text(json.loads(response.read().decode('utf-8')))
+            def ask(key):
+                request = urllib.request.Request('https://api.openai.com/v1/responses', data=json.dumps(request_body).encode('utf-8'), headers={'Authorization':'Bearer '+key,'Content-Type':'application/json'}, method='POST')
+                with urllib.request.urlopen(request, timeout=45) as response: return extract_text(json.loads(response.read().decode('utf-8')))
+            try: answer = ask(api_key)
+            except urllib.error.HTTPError as error:
+                if error.code != 401: raise
+                clear_key()
+                try: answer = ask(get_key(force_refresh=True))
+                except KeygenError as key_error: self.send_json(503, {'error': {'message': key_error.message, 'fix': key_error.fix}}); return
             self.send_json(200, {'answer': answer or 'I could not find an answer. Please try a shorter question or ask your coach.'})
-        except (urllib.error.HTTPError, urllib.error.URLError, TimeoutError, ValueError, json.JSONDecodeError): self.send_json(502, {'error':'I cannot answer right now. Please check the OpenAI key and internet connection.'})
+        except (urllib.error.HTTPError, urllib.error.URLError, TimeoutError, ValueError, json.JSONDecodeError): self.send_json(502, {'error': {'message':'I cannot answer right now.', 'fix':'Check the MindDo key service and internet connection.'}})
         except Exception: self.send_json(500, {'error':'Something went wrong. Please try again or ask a coach.'})
 
 if __name__ == '__main__':
