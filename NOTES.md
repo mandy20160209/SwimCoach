@@ -8,7 +8,7 @@ After each save point, push it to GitHub.
 2. Run: `python3 server.py`
 3. Open: http://localhost:8000
 
-Model: `gpt-6-luna` (set `OPENAI_MODEL` in the environment if your account uses a different available model).
+Model: `gpt-5.6-luna` (set `OPENAI_MODEL` in the environment if your account uses a different available model).
 
 ## What’s done
 
@@ -40,7 +40,7 @@ Model: `gpt-6-luna` (set `OPENAI_MODEL` in the environment if your account uses 
 - The online AI endpoint is `api/coach.py`, a Vercel Python Function served at `/api/coach`.
 - Vercel finds the function automatically from the `api` folder; no special build command or `vercel.json` setting is needed.
 - Add two Vercel environment variables named `KEYGEN_URL` and `KEYGEN_TOKEN` for the Production, Preview, and Development environments as needed. Do not add the OpenAI key to Vercel.
-- `OPENAI_MODEL` is optional. If it is not set, the function uses `gpt-6-luna`.
+- `OPENAI_MODEL` is optional. If it is not set, the function uses `gpt-5.6-luna`.
 - The local command remains `python3 server.py`; it reads the MindDo settings from the ignored local `.env` file.
 - Browser saving remains localStorage on each device; Vercel does not add a database.
 

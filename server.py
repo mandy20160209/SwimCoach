@@ -4,7 +4,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from keygen import KeygenError, clear_key, get_key
 
 ROOT = pathlib.Path(__file__).parent
-MODEL = os.environ.get('OPENAI_MODEL', 'gpt-6-luna')
+MODEL = os.environ.get('OPENAI_MODEL', 'gpt-5.6-luna')
 
 def load_env():
     path = ROOT / '.env'
