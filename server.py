@@ -44,7 +44,7 @@ class Handler(BaseHTTPRequestHandler):
             for name, value in load_env().items(): os.environ.setdefault(name, value)
             try: api_key = get_key()
             except KeygenError as error: self.send_json(503, {'error': {'message': error.message, 'fix': error.fix}}); return
-            context = {'level': body.get('level', 'not chosen'), 'reflections': body.get('reflections', [])}
+            context = {'level': body.get('level', 'not chosen'), 'posture_description': body.get('postureDescription', '')}
             request_body = {'model': MODEL, 'instructions': (ROOT/'BRIEF.md').read_text(encoding='utf-8'), 'input': [{'role':'user','content':'Swimmer context: '+json.dumps(context)+'\n\nQuestion: '+question}], 'max_output_tokens':500}
             def ask(key):
                 request = urllib.request.Request('https://api.openai.com/v1/responses', data=json.dumps(request_body).encode('utf-8'), headers={'Authorization':'Bearer '+key,'Content-Type':'application/json'}, method='POST')

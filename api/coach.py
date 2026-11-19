@@ -51,7 +51,7 @@ class handler(BaseHTTPRequestHandler):
                 self.send_json(503, {'error': {'message': error.message, 'fix': error.fix}})
                 return
 
-            context = {'level': body.get('level', 'not chosen'), 'reflections': body.get('reflections', [])}
+            context = {'level': body.get('level', 'not chosen'), 'posture_description': body.get('postureDescription', '')}
             instructions = (ROOT / 'BRIEF.md').read_text(encoding='utf-8')
             request_body = {
                 'model': MODEL,

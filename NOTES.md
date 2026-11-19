@@ -12,7 +12,7 @@ Model: `gpt-5.6-luna` (set `OPENAI_MODEL` in the environment if your account use
 
 ## What’s done
 
-- Version 1 web app with a camera preview, posture reflection checklist, and guided posture description.
+- Version 1 web app with a written posture description, guided posture feedback, and safe lessons.
 - Posture lesson links, a swimmer-level check, and a real server-side AI question flow.
 - The AI key comes from `getKey()` through the server-only key helper; it is never sent to the browser.
 - AI requests include the project instructions from `BRIEF.md` every time.
@@ -29,7 +29,7 @@ Model: `gpt-5.6-luna` (set `OPENAI_MODEL` in the environment if your account use
 
 ## MVP check
 
-- Camera posture check: works as a local camera preview, self-reflection checklist, and guided description; automatic pose detection is next.
+- Written posture check: works from the swimmer’s own description and gives simple, guided feedback.
 - Fix-posture videos: works through clearly labeled YouTube search links.
 - Swimming knowledge: works through the level selector and local save.
 - Safe AI answers: works when MindDo returns a current key, the internet works, and the configured model works; otherwise it shows `error.message` and logs `error.fix` once.
@@ -47,10 +47,10 @@ Model: `gpt-5.6-luna` (set `OPENAI_MODEL` in the environment if your account use
 ## Maybe Later
 
 - Show an AI response in detail about what the user does wrong.
-- Ask the user if the app can access the user’s camera.
+- Improve the written posture description with more tested examples.
 
 ## Next
 
-- Replace the camera checklist with tested pose detection.
+- Test the written posture guidance with swimmers and coaches.
 - Verify the model name and key with the OpenAI account.
 - Add a short demo script and challenge entry materials.

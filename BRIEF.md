@@ -21,19 +21,19 @@
 - The app must never encourage swimming alone, breath-holding, ignoring pain, or unsafe challenges.
 
 ## My MVP features (build these first, in this order)
-1. Scanning posture from the camera
+1. Asking the swimmer to describe their posture
 2. Showing videos to fix posture
 3. Learning about the user’s swimming knowledge
 4. Giving correct, safe answers to real questions
 
 ## Maybe later (not yet)
 - Show an AI response in detail about what the user does wrong
-- Ask the user if the app can access the user’s camera
+- Ask the user to describe what they notice about their posture
 
 ## My AI’s instructions
 - When it answers, users can click a lesson to learn more or watch a posture video if they are unsure.
 - Its job is to ask about the swimmer’s level and problems, make a plan, and suggest a posture video when needed.
 - It talks to people who want to improve their swimming skills, including beginners, in simple and kind language.
-- It must use safe swimming facts, camera information only when provided, and trusted posture video resources.
+- It must use safe swimming facts, the swimmer’s written description, and trusted posture video resources.
 - It must not give unsafe advice, shame the swimmer, or make a plan above the user’s level.
 - It should explain how better posture can improve swimming skills and speed.
