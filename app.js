@@ -16,6 +16,19 @@
     store.write({ reflections });
     $('cameraMessage').textContent = reflections.length ? 'Saved. You noticed something important.' : 'Saved. You can notice more next time.';
   });
+  $('describePosture').addEventListener('click', () => {
+    const reflections = [...document.querySelectorAll('[data-reflection]:checked')].map((input) => input.dataset.reflection);
+    const descriptions = {
+      head: 'Your observation suggests your head may be lifted. Try looking down at the pool floor and keeping your neck relaxed.',
+      hips: 'Your observation suggests your hips or legs may sink. Try making your body long and keeping your hips closer to the surface.',
+      line: 'Your observation suggests your body line may not feel long and straight yet. Try reaching forward and pointing your toes.',
+      unsure: 'You are not sure yet, and that is okay. Ask a coach to watch you from the side or use a short posture lesson.'
+    };
+    const text = reflections.length ? reflections.map((item) => descriptions[item]).join(' ') : 'Choose what you notice first, then I can describe your starting posture in simple words.';
+    $('postureDescriptionText').textContent = text;
+    $('postureDescription').hidden = false;
+    store.write({ reflections });
+  });
   $('resetProgress').addEventListener('click', () => { if (confirm('Clear the progress saved on this computer?')) { store.reset(); location.reload(); } });
   $('startCamera').addEventListener('click', async () => {
     if (!navigator.mediaDevices?.getUserMedia) { $('cameraMessage').textContent = 'This browser cannot use the camera here.'; return; }
